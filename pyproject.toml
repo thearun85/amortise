@@ -1,0 +1,71 @@
+[project]
+name = "amortise"
+version = "v0.1.0-alpha"
+description = "A loan repayment schedule generation and validation library in Python"
+authors = [
+    {name = "Arun Raghunath"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ruff (>=0.15.7,<0.16.0)",
+    "mypy (>=1.19.1,<2.0.0)",
+    "pytest (>=9.0.2,<10.0.0)"
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+ 
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking — moves TYPE_CHECKING-only imports
+    "ANN", # flake8-annotations — enforces type hints
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "ANN101", # missing type annotation for self — noise
+    "ANN102", # missing type annotation for cls — noise
+]
+ 
+[tool.ruff.lint.isort]
+known-first-party = ["amortise"]
+ 
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+ 
+# ---------------------------------------------------------------------------
+# Mypy — strict
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+show_error_codes = true
+pretty = true
+ 
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
