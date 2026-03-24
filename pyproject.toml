@@ -40,10 +40,7 @@ select = [
     "ANN", # flake8-annotations — enforces type hints
     "RUF", # ruff-specific rules
 ]
-ignore = [
-    "ANN101", # missing type annotation for self — noise
-    "ANN102", # missing type annotation for cls — noise
-]
+ignore = []
  
 [tool.ruff.lint.isort]
 known-first-party = ["amortise"]
