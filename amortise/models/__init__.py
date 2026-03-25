@@ -1,3 +1,3 @@
-from .loan import LoanRequest, RepaymentType, RateType
+from .loan import LoanRequest, RateType, RepaymentType
 
-__all__ = ['LoanRequest', 'RepaymentType', 'RateType']
+__all__ = ["LoanRequest", "RateType", "RepaymentType"]
