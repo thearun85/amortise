@@ -34,7 +34,7 @@ select = [
     "ANN", # flake8-annotations — enforces type hints
     "RUF", # ruff-specific rules
 ]
-ignore = []
+ignore = ["ANN101"]
  
 [tool.ruff.lint.isort]
 known-first-party = ["amortise"]

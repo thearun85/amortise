@@ -64,27 +64,27 @@ class TestValidLoanRequest:
 
 
 class TestTypeEnforcement:
-    def test_float_principal_raises_Type_Error(self) -> None:
+    def test_float_principal_raises(self) -> None:
         with pytest.raises(TypeError, match="'principal' must be Decimal"):
             make(principal=float("250000.00"))
 
-    def test_float_annual_rate_raises_Type_Error(self) -> None:
+    def test_float_annual_rate_raises(self) -> None:
         with pytest.raises(TypeError, match="'annual_rate' must be Decimal"):
             make(annual_rate=float("0.0525"))
 
-    def test_str_principal_raises_Type_Error(self) -> None:
+    def test_str_principal_raises(self) -> None:
         with pytest.raises(TypeError, match="'principal' must be Decimal"):
             make(principal="250000.00")
 
-    def test_str_annual_rate_raises_Type_Error(self) -> None:
+    def test_str_annual_rate_raises(self) -> None:
         with pytest.raises(TypeError, match="'annual_rate' must be Decimal"):
             make(annual_rate="0.0525")
 
-    def test_int_principal_raises_Type_Error(self) -> None:
+    def test_int_principal_raises(self) -> None:
         with pytest.raises(TypeError, match="'principal' must be Decimal"):
             make(principal=250000)
 
-    def test_int_annual_rate_raises_Type_Error(self) -> None:
+    def test_int_annual_rate_raises(self) -> None:
         with pytest.raises(TypeError, match="'annual_rate' must be Decimal"):
             make(annual_rate=int(0.0525))
 

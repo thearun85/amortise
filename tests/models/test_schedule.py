@@ -15,7 +15,6 @@ from amortise.models.schedule import CalcTrace, Installment, Schedule
 
 
 def make_loan() -> LoanRequest:
-
     return LoanRequest(
         principal=Decimal("100000.00"),
         annual_rate=Decimal("0.0525"),
@@ -31,7 +30,9 @@ def make_trace(opening_balance: Decimal = Decimal("100000.00")) -> CalcTrace:
     days_in_period: int = 31
     days_in_year: int = 365
 
-    interest_gross = opening_balance * annual_rate * Decimal(days_in_period) / Decimal(days_in_year)
+    interest_gross = (
+        opening_balance * annual_rate * Decimal(days_in_period) / Decimal(days_in_year)
+    )
     interest_rounded = interest_gross.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     rounding_delta = interest_rounded - interest_gross
 
@@ -49,7 +50,6 @@ def make_trace(opening_balance: Decimal = Decimal("100000.00")) -> CalcTrace:
 def make_installment(
     number: int, opening_balance: Decimal = Decimal("100000.00")
 ) -> Installment:
-
     interest: Decimal = Decimal("100.00")
     principal: Decimal = Decimal("756.00")
     payment: Decimal = principal + interest
@@ -68,8 +68,7 @@ def make_installment(
 
 
 def make_schedule(n: int) -> Schedule:
-
-    installments = tuple(make_installment(i+1) for i in range(n))
+    installments = tuple(make_installment(i + 1) for i in range(n))
     return Schedule(
         loan=make_loan(),
         installments=installments,
@@ -130,7 +129,7 @@ class TestSchedule:
     def test_installments_is_tuple(self) -> None:
         schedule = make_schedule(2)
         assert isinstance(schedule.installments, tuple)
-        
+
     def test_total_interest_sums_interest(self) -> None:
         schedule = make_schedule(2)
         expected = sum(i.interest for i in schedule.installments)

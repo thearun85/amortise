@@ -12,6 +12,7 @@ Floats and strings are rejected at the boundary. See ADR-001.
 """
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
