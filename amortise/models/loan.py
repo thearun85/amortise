@@ -3,20 +3,19 @@
 Only fields required for Phase 1 are defined here.
  - Rate Type - Fixed and Variable
  - Payment frequency - Monthly
- - Repayment types - Principal & interest and Interest only
+ - Repayment types - Capital & interest and Interest only
  - Days - actual/365
 
- No float values are accepted.
- All monetary and rate inputs must be supplied as str or Decimal.
- Floats are rejected as the boundary.
+No float values are accepted.
+All monetary and rate inputs must be supplied as Decimal.
+Floats and strings are rejected at the boundary. See ADR-001.
 """
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import datetime # Only imported by the type checkers, not at runtime
-    
+    import datetime  # Only imported by the type checkers, not at runtime
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
@@ -32,7 +31,7 @@ class RateType(StrEnum):
 class RepaymentType(StrEnum):
     """How the loan is repaid over its term."""
 
-    PRINCIPAL_AND_INTEREST = "principal_and_interest"
+    CAPITAL_AND_INTEREST = "capital_and_interest"
     INTEREST_ONLY = "interest_only"
 
 

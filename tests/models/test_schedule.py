@@ -21,23 +21,23 @@ def make_loan() -> LoanRequest:
         annual_rate=Decimal("0.0525"),
         term_months=12,
         start_date=datetime.date(2026, 3, 1),
-        repayment_type=RepaymentType.PRINCIPAL_AND_INTEREST,
+        repayment_type=RepaymentType.CAPITAL_AND_INTEREST,
         rate_type=RateType.FIXED,
     )
 
 
 def make_trace(opening_balance: Decimal = Decimal("100000.00")) -> CalcTrace:
-    periodic_rate: Decimal = Decimal("0.0525") / 12  # Annual_rate divided by 12 months
+    annual_rate: Decimal = Decimal("0.0525")
     days_in_period: int = 31
     days_in_year: int = 365
 
-    interest_gross = opening_balance * periodic_rate
+    interest_gross = opening_balance * annual_rate * Decimal(days_in_period) / Decimal(days_in_year)
     interest_rounded = interest_gross.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    rounding_delta = interest_gross - interest_rounded
+    rounding_delta = interest_rounded - interest_gross
 
     return CalcTrace(
         opening_balance=opening_balance,
-        periodic_rate=periodic_rate,
+        annual_rate=annual_rate,
         days_in_period=days_in_period,
         days_in_year=days_in_year,
         interest_gross=interest_gross,
@@ -69,7 +69,7 @@ def make_installment(
 
 def make_schedule(n: int) -> Schedule:
 
-    installments = tuple(make_installment(i) for i in range(n))
+    installments = tuple(make_installment(i+1) for i in range(n))
     return Schedule(
         loan=make_loan(),
         installments=installments,
@@ -84,7 +84,12 @@ class TestCalcTrace:
 
     def test_rounding_delta_is_difference(self) -> None:
         trace = make_trace()
-        assert trace.rounding_delta == trace.interest_gross - trace.interest_rounded
+        assert trace.rounding_delta == trace.interest_rounded - trace.interest_gross
+
+    def test_interest_gross_uses_actual_365_formula(self) -> None:
+        trace = make_trace()
+        expected = Decimal("100000.00") * Decimal("0.0525") * Decimal(31) / Decimal(365)
+        assert trace.interest_gross == expected
 
     def test_is_immutable(self) -> None:
         trace = make_trace()
@@ -107,6 +112,10 @@ class TestInstallment:
         with pytest.raises(FrozenInstanceError):
             installment.number = 1  # type: ignore[misc]
 
+    def test_calc_trace_is_present(self) -> None:
+        installment = make_installment(number=1, opening_balance=Decimal("100000.00"))
+        assert isinstance(installment.calc_trace, CalcTrace)
+
 
 class TestSchedule:
     def test_constructs_cleanly(self) -> None:
@@ -118,19 +127,19 @@ class TestSchedule:
         schedule = make_schedule(2)
         assert schedule.generated_at.tzinfo is datetime.UTC
 
+    def test_installments_is_tuple(self) -> None:
+        schedule = make_schedule(2)
+        assert isinstance(schedule.installments, tuple)
+        
     def test_total_interest_sums_interest(self) -> None:
         schedule = make_schedule(2)
         expected = sum(i.interest for i in schedule.installments)
         assert schedule.total_interest == expected
 
-    def test_total_principal_sums_interest(self) -> None:
+    def test_total_principal_sums_payments(self) -> None:
         schedule = make_schedule(2)
         expected = sum(i.payment for i in schedule.installments)
         assert schedule.total_payment == expected
-
-    def test_installments_is_tuple(self) -> None:
-        schedule = make_schedule(2)
-        assert isinstance(schedule.installments, tuple)
 
     def test_is_immutable(self) -> None:
         schedule = make_schedule(2)

@@ -34,9 +34,12 @@ class CalcTrace:
     that any figure on the schedule can be independently reproduced
     and explained. Always present - not a debug flag.
 
+    Formula (actual/365):
+        interest_gross = opening_balance * annual_rate * (days_in_period / days_in_year)
+
     Attributes:
         opening_balance: Principal outstanding at the start of the period.
-        periodic_rate: Monthly interest rate applied (annual_rate / 12).
+        annual_rate: Annual interest rate as a decimal fraction (e.g. 0.0525).
         days_in_period: Actual number of days in this repayment period.
         days_in_year: Day count denominator - 365 for actual/ 365 convention.
         interest_gross: Raw interest before rounding.
@@ -46,7 +49,7 @@ class CalcTrace:
     """
 
     opening_balance: Decimal
-    periodic_rate: Decimal
+    annual_rate: Decimal
     days_in_period: int
     days_in_year: int
     interest_gross: Decimal

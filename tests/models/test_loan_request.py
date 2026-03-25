@@ -18,7 +18,7 @@ VALID: dict[str, Any] = {
     "annual_rate": Decimal("0.0525"),
     "term_months": 300,
     "start_date": datetime.date(2026, 1, 1),
-    "repayment_type": RepaymentType.PRINCIPAL_AND_INTEREST,
+    "repayment_type": RepaymentType.CAPITAL_AND_INTEREST,
     "rate_type": RateType.FIXED,
 }
 
@@ -39,7 +39,7 @@ class TestValidLoanRequest:
         assert loan.annual_rate == Decimal("0.0525")
         assert loan.term_months == 300
         assert loan.start_date == datetime.date(2026, 1, 1)
-        assert loan.repayment_type == RepaymentType.PRINCIPAL_AND_INTEREST
+        assert loan.repayment_type == RepaymentType.CAPITAL_AND_INTEREST
         assert loan.rate_type == RateType.FIXED
 
     def test_interest_only_variable(self) -> None:
