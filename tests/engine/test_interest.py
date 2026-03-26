@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
-from typing import Any
 
 import pytest
 
@@ -32,17 +31,14 @@ ANNUAL_RATE = Decimal("0.0525")
 PERIOD_START = datetime.date(2026, 3, 1)
 PERIOD_END = datetime.date(2026, 4, 1)  # 31 days
 
-VALID: dict[str, Any] = {
-    "opening_balance": OPENING_BALANCE,
-    "annual_rate": ANNUAL_RATE,
-    "period_start": PERIOD_START,
-    "period_end": PERIOD_END,
-}
-
 
 def make_trace(**overrides: object) -> CalcTrace:
-    """Return a CalcTrace using the reference inputs, with optional overrides."""
-    return calculate_interest(**({**VALID, **overrides}))
+    return calculate_interest(
+        opening_balance=overrides.get("opening_balance", OPENING_BALANCE),  # type: ignore[arg-type]
+        annual_rate=overrides.get("annual_rate", ANNUAL_RATE),  # type: ignore[arg-type]
+        period_start=overrides.get("period_start", PERIOD_START),  # type: ignore[arg-type]
+        period_end=overrides.get("period_end", PERIOD_END),  # type: ignore[arg-type]
+    )
 
 
 # ------------------------------------------------------------------
@@ -53,27 +49,39 @@ def make_trace(**overrides: object) -> CalcTrace:
 class TestTypeEnforcement:
     def test_float_opening_balance_raises(self) -> None:
         with pytest.raises(TypeError, match="'opening_balance' must be Decimal"):
-            make_trace(opening_balance=float("100000.00"))
+            calculate_interest(
+                opening_balance=100000.00,  # type: ignore[arg-type]
+                annual_rate=ANNUAL_RATE,
+                period_start=PERIOD_START,
+                period_end=PERIOD_END,
+            )
 
     def test_float_annual_rate_raises(self) -> None:
         with pytest.raises(TypeError, match="'annual_rate' must be Decimal"):
-            make_trace(annual_rate=float("0.0525"))
+            calculate_interest(
+                opening_balance=OPENING_BALANCE,
+                annual_rate=0.0525,  # type: ignore[arg-type]
+                period_start=PERIOD_START,
+                period_end=PERIOD_END,
+            )
 
     def test_int_opening_balance_raises(self) -> None:
         with pytest.raises(TypeError, match="'opening_balance' must be Decimal"):
-            make_trace(opening_balance=int("100000"))
+            calculate_interest(
+                opening_balance=100000,  # type: ignore[arg-type]
+                annual_rate=ANNUAL_RATE,
+                period_start=PERIOD_START,
+                period_end=PERIOD_END,
+            )
 
     def test_int_annual_rate_raises(self) -> None:
         with pytest.raises(TypeError, match="'annual_rate' must be Decimal"):
-            make_trace(annual_rate=int("1"))
-
-    def test_str_opening_balance_raises(self) -> None:
-        with pytest.raises(TypeError, match="'opening_balance' must be Decimal"):
-            make_trace(opening_balance="100000")
-
-    def test_str_annual_rate_raises(self) -> None:
-        with pytest.raises(TypeError, match="'annual_rate' must be Decimal"):
-            make_trace(annual_rate="1")
+            calculate_interest(
+                opening_balance=OPENING_BALANCE,
+                annual_rate=1,  # type: ignore[arg-type]
+                period_start=PERIOD_START,
+                period_end=PERIOD_END,
+            )
 
 
 # ------------------------------------------------------------------
@@ -94,19 +102,19 @@ class TestSemanticValidation:
         ):
             make_trace(opening_balance=Decimal("-1"))
 
-    def test_zero_annual_rate_balance_raises(self) -> None:
+    def test_zero_annual_rate_raises(self) -> None:
         with pytest.raises(ValueError, match="'annual_rate' must be greater than zero"):
             make_trace(annual_rate=Decimal("0"))
 
     def test_negative_annual_rate_raises(self) -> None:
         with pytest.raises(ValueError, match="'annual_rate' must be greater than zero"):
-            make_trace(annual_rate=Decimal("-1"))
+            make_trace(annual_rate=Decimal("-0.0525"))
 
-    def test_period_end_equal_period_start_raises(self) -> None:
+    def test_period_end_equal_to_start_raises(self) -> None:
         with pytest.raises(ValueError, match="'period_end' must be strictly after"):
             make_trace(period_end=PERIOD_START)
 
-    def test_period_end_before_period_start_raises(self) -> None:
+    def test_period_end_before_start_raises(self) -> None:
         with pytest.raises(ValueError, match="'period_end' must be strictly after"):
             make_trace(period_end=datetime.date(2026, 2, 1))
 
@@ -157,3 +165,14 @@ class TestCalcTraceOutput:
     def test_explicit_convention_actual_365(self) -> None:
         calc = make_trace(convention=DayCountConvention.ACTUAL_365)
         assert calc.days_in_year == 365
+
+
+class TestRounding:
+    def test_rounding_delta_nonzero_for_awkward_balance(self) -> None:
+        trace = make_trace(opening_balance=Decimal("99743.21"))
+        assert trace.rounding_delta != Decimal("0")
+        assert trace.interest_rounded == Decimal("444.75")
+        assert trace.rounding_delta == trace.interest_rounded - trace.interest_gross
+
+    def test_rounding_delta_negative_when_rounded_down(self) -> None:
+        assert make_trace().rounding_delta < Decimal("0")

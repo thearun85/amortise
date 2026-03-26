@@ -6,11 +6,11 @@ the interest due for one repayment period and returns a fully populated
 
 Day count conventions
 ---------------------
-Omly ``ACTUAL_365`` is supported in Phase 1. The convention is encoded
+Only ``ACTUAL_365`` is supported in Phase 1. The convention is encoded
 as a ``StrEnum`` so additional conventions (ACT/360, 30/360, etc.) can
 be added later without a breaking interface change.
 
-ACTUAl_365
+ACTUAL_365
     days_in_period = (period_end - period_start).days
     interest_gross = opening_balance * annual_rate * (days_in_period / 365)
     ``period_end`` is exclusive - the period March 1 -> April 1 is 31 days.
@@ -63,7 +63,7 @@ def calculate_interest(
         annual_rate: Annual interest rate as a decimal fraction
             (e.g. ``Decimal('0.0525'))``).
         period_start: First day of the interest period (inclusive).
-        period_end: First day of the next period (exclusve).
+        period_end: First day of the next period (exclusive).
         convention: Day count convention to apply. Defaults to ``ACTUAL_365``.
 
     Returns:

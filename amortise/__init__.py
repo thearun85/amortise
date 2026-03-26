@@ -37,17 +37,16 @@ Example
         )
 """
 
-
 from amortise.engine.schedule import generate_schedule
-from amortise.models.loan import LoanRequest, RepaymentType, RateType
+from amortise.models.loan import LoanRequest, RateType, RepaymentType
 from amortise.models.schedule import CalcTrace, Installment, Schedule
 
 __all__ = [
-    'CalcTrace',
-    'Installment',
-    'LoanRequest',
-    'RateType',
-    'RepaymentType',
-    'Schedule',
-    'generate_schedule',
+    "CalcTrace",
+    "Installment",
+    "LoanRequest",
+    "RateType",
+    "RepaymentType",
+    "Schedule",
+    "generate_schedule",
 ]
